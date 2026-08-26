@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>I Love You ❤️</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+
+            background: #000;
+
+            width: 100vw;
+            height: 100vh;
+
+            overflow: hidden;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+        }
+
+
+        /* CONTENEDOR DEL CORAZÓN */
+
+        #heart {
+
+            position: relative;
+
+            width: min(90vw, 600px);
+            height: min(90vw, 600px);
+
+            animation:
+                heartbeat 2.5s
+                ease-in-out
+                infinite;
+
+        }
+
+
+        /* CADA "I LOVE YOU" */
+
+        .love {
+
+            position: absolute;
+
+            color: #ea80b0;
+
+            font-family: Arial, sans-serif;
+
+            font-size: 15px;
+
+            font-weight: bold;
+
+            white-space: nowrap;
+
+            text-shadow:
+
+                0 0 3px white,
+                0 0 6px #ea80b0,
+                0 0 12px #ea80b0,
+                0 0 20px #ea80b0;
+
+            opacity: 0;
+
+            transform-origin: center;
+
+        }
+
+
+        /*
+        =========================================
+        APARICIÓN DE CADA PALABRA
+        =========================================
+        */
+
+        .love.show {
+
+            animation:
+
+                appear
+                0.5s
+                ease-out
+                forwards;
+
+        }
+
+
+        @keyframes appear {
+
+            0% {
+
+                opacity: 0;
+
+                transform:
+                    translate(-50%, -50%)
+                    scale(0.2);
+
+                filter: blur(5px);
+
+            }
+
+            60% {
+
+                opacity: 1;
+
+                transform:
+                    translate(-50%, -50%)
+                    scale(1.15);
+
+                filter: blur(0);
+
+            }
+
+            100% {
+
+                opacity: 1;
+
+                transform:
+                    translate(-50%, -50%)
+                    scale(1);
+
+                filter: blur(0);
+
+            }
+
+        }
+
+
+        /*
+        =========================================
+        LATIDO
+        =========================================
+        */
+
+        @keyframes heartbeat {
+
+            0% {
+                transform: scale(1);
+            }
+
+            10% {
+                transform: scale(1.025);
+            }
+
+            20% {
+                transform: scale(1);
+            }
+
+            30% {
+                transform: scale(1.025);
+            }
+
+            40% {
+                transform: scale(1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+
+        }
+
+
+        /*
+        =========================================
+        CELULAR
+        =========================================
+        */
+
+        @media(max-width: 600px) {
+
+            .love {
+
+                font-size: 10px;
+
+                letter-spacing: 1px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div id="heart"></div>
+
+
+<script>
+
+
+    /*
+    =========================================
+                CONFIGURACIÓN
+    =========================================
+    */
+
+    const heart =
+        document.getElementById("heart");
+
+
+    const cantidad = 150;
+
+
+    const escala = 15;
+
+
+    const texto = "te amo sirley";
+
+
+    /*
+    Tiempo entre cada palabra.
+
+    25 = rápido
+    50 = normal
+    80 = lento
+    */
+
+    const velocidad = 35;
+
+
+
+    /*
+    =========================================
+            ECUACIÓN DEL CORAZÓN
+    =========================================
+    */
+
+    function corazon(t) {
+
+
+        const x =
+            16 *
+            Math.pow(Math.sin(t), 3);
+
+
+        const y =
+
+            13 * Math.cos(t)
+
+            - 5 * Math.cos(2 * t)
+
+            - 2 * Math.cos(3 * t)
+
+            - Math.cos(4 * t);
+
+
+        return {
+
+            x: x * escala,
+
+            y: -y * escala
+
+        };
+
+    }
+
+
+
+    /*
+    =========================================
+        CREAR PALABRAS POCO A POCO
+    =========================================
+    */
+
+
+    const palabras = [];
+
+
+    for (let i = 0; i < cantidad; i++) {
+
+
+        const palabra =
+            document.createElement("div");
+
+
+        palabra.className = "love";
+
+
+        palabra.innerText = texto;
+
+
+        /*
+        Posición sobre el corazón
+        */
+
+        const t =
+
+            (i / cantidad) *
+            Math.PI *
+            2;
+
+
+        const punto =
+            corazon(t);
+
+
+        /*
+        Siguiente punto para calcular
+        hacia dónde debe mirar el texto
+        */
+
+        const siguiente =
+            corazon(t + 0.01);
+
+
+        const dx =
+            siguiente.x - punto.x;
+
+
+        const dy =
+            siguiente.y - punto.y;
+
+
+        const angulo =
+
+            Math.atan2(dy, dx)
+            * 180 / Math.PI;
+
+
+
+        /*
+        Posición
+        */
+
+        palabra.style.left =
+
+            `calc(50% + ${punto.x}px)`;
+
+
+        palabra.style.top =
+
+            `calc(50% + ${punto.y}px)`;
+
+
+
+        /*
+        Rotación
+        */
+
+        palabra.style.transform =
+
+            `translate(-50%, -50%)
+             rotate(${angulo}deg)`;
+
+
+        /*
+        Añadir al corazón
+        */
+
+        heart.appendChild(palabra);
+
+
+        palabras.push(palabra);
+
+    }
+
+
+
+    /*
+    =========================================
+        HACER QUE APAREZCAN UNA POR UNA
+    =========================================
+    */
+
+
+    palabras.forEach((palabra, i) => {
+
+
+        setTimeout(() => {
+
+
+            palabra.classList.add("show");
+
+
+        }, i * velocidad);
+
+
+    });
+
+
+
+</script>
+
+
+</body>
+
+</html>
